@@ -18,16 +18,17 @@ class TurbineFactory extends Factory
         $latitude = $this->faker->latitude();
         $longitude = $this->faker->longitude();
 
-        // Call the OpenCage API
-        $apiKey = env('OPENCAGE_API_KEY'); // Store your API key in .env
+        // call the OpenCage API
+        $apiKey = env('OPENCAGE_API_KEY');
         $response = Http::get("https://api.opencagedata.com/geocode/v1/json", [
             'q' => "$latitude,$longitude",
             'key' => $apiKey,
         ]);
 
-        // Parse city name from response
-        $name = 'Unknown Area'; // Default value
+        // default area name
+        $name = 'Unknown Area';
 
+        // if coordinates are successful for any of the bottom results, attach these as new 'name'
         if ($response->successful() && !empty($response->json()['results'])) {
             $components = $response->json()['results'][0]['components'] ?? [];
             $name = $components['city']

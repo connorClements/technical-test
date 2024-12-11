@@ -75,15 +75,14 @@ export default {
             axios
                 .post("/turbines", req)
                 .then((response) => {
-                    // Reload the turbine data or trigger any necessary state updates
-                    console.log(response);
-
-                    alert(response.data.message);
-
+                    // trigger turbines update
                     this.$emit("updateTurbines", response.data.turbines);
 
-                    const modal = document.getElementById("add_turbine_modal");
-                    modal.close();
+                    // close modal
+                    this.closeModal();
+
+                    // alert showing turbine has been created
+                    alert(response.data.message);
                 })
                 .catch((error) => {
                     // Handle error
@@ -91,6 +90,7 @@ export default {
                 });
         },
 
+        // close modal
         closeModal() {
             const modal = document.getElementById("add_turbine_modal");
             modal.close();

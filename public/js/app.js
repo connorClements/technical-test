@@ -24025,6 +24025,7 @@ __webpack_require__.r(__webpack_exports__);
   },
   data: function data() {
     return {
+      // leaflet data
       zoom: 2,
       defaultCenter: [47.41322, -1.219482],
       iconSize: 32,
@@ -24033,17 +24034,21 @@ __webpack_require__.r(__webpack_exports__);
         iconSize: [32, 37],
         iconAnchor: [16, 37]
       }),
+      // selected turbine/id/component/inspection for showing/hiding parts of page
       selectedTurbine: null,
       selectedTurbineId: null,
       selectedComponent: null,
       selectedInspection: null,
+      // turbines array
       turbines: []
     };
   },
   created: function created() {
+    // on page creation, fetch turbine data
     this.fetchTurbines();
   },
   computed: {
+    // icon size and anchor on map
     dynamicSize: function dynamicSize() {
       return [this.iconSize, this.iconSize * 1.15];
     },
@@ -24052,17 +24057,21 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   methods: {
+    // get turbines (ensure they are empty and reload when fetching new data so component/incpection changes load through)
     fetchTurbines: function fetchTurbines() {
       var _this = this;
       this.turbines = [];
       axios__WEBPACK_IMPORTED_MODULE_8___default().get("/turbines").then(function (resp) {
         _this.turbines = resp.data.turbines;
+
+        // re-select turbine so table doesn't disappear at bottom on update/deletion of components/inspections
         if (_this.selectedTurbineId) {
           var turbine = _this.turbines.find(function (t) {
             return t.id === _this.selectedTurbineId;
           });
           if (turbine) {
-            _this.selectedTurbine = turbine; // Reselect the turbine
+            // reselect the turbine
+            _this.selectedTurbine = turbine;
           }
         }
       })["catch"](function (error) {
@@ -24070,33 +24079,40 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     updateTurbines: function updateTurbines(newTurbines) {
-      // Update the turbines data when the event is emitted
+      // update the turbines data when the event is emitted
       this.fetchTurbines();
     },
+    // select specific turbine on click - for table
     selectTurbine: function selectTurbine(turbine) {
       console.log(turbine);
       this.selectedTurbine = turbine;
       this.selectedTurbineId = turbine.id;
     },
+    // select specific component on click - for modal
     selectComponent: function selectComponent(component) {
       this.selectedComponent = component;
       document.getElementById("delete_component_modal").showModal();
     },
+    // select specific component on click - for modal
     addInspection: function addInspection(component) {
       this.selectedComponent = component;
       document.getElementById("add_inspection_modal").showModal();
     },
+    // select specific turbine on click - for modal
     addComponent: function addComponent(turbine) {
       this.selectedTurbine = turbine;
       document.getElementById("add_component_modal").showModal();
     },
+    // show 'add turbine' modal
     addTurbine: function addTurbine() {
       document.getElementById("add_turbine_modal").showModal();
     },
+    // select inspection for deletion and show modal
     selectInspection: function selectInspection(inspection) {
       this.selectedInspection = inspection;
       document.getElementById("delete_inspection_modal").showModal();
     },
+    // show components/inspections table
     viewInspections: function viewInspections() {
       // Scroll to the table with a smooth effect
       var table = document.getElementById("inspectionsTable");
@@ -24127,7 +24143,7 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   props: {
-    turbine: Object // The ID of the component to add the inspection for
+    turbine: Object
   },
   data: function data() {
     return {
@@ -24135,6 +24151,7 @@ __webpack_require__.r(__webpack_exports__);
     };
   },
   methods: {
+    // submit new component as axios post request
     submitComponent: function submitComponent() {
       var _this = this;
       var req = {
@@ -24142,17 +24159,24 @@ __webpack_require__.r(__webpack_exports__);
         name: this.name
       };
       axios__WEBPACK_IMPORTED_MODULE_0___default().post("/components", req).then(function (response) {
-        // Reload the turbine data or trigger any necessary state updates
-
+        // emit turbines, which will trigger overall turbines update on parent
         _this.$emit("updateTurbines", response.data.turbines);
-        var modal = document.getElementById("add_component_modal");
-        modal.close();
+
+        // empty fields
+        _this.name = "";
+
+        // close modal
+        _this.closeModal();
+
+        // alert to show component is updated
         alert(response.data.message);
+        _this.name = "";
       })["catch"](function (error) {
         // Handle error
         console.error("Error submitting component:", error);
       });
     },
+    // close modal
     closeModal: function closeModal() {
       var modal = document.getElementById("add_component_modal");
       modal.close();
@@ -24182,29 +24206,36 @@ __webpack_require__.r(__webpack_exports__);
   },
   data: function data() {
     return {
-      inspection_date: "",
+      inspectionDate: "",
       score: ""
     };
   },
   methods: {
+    // submit new inspection as POST
     submitInspection: function submitInspection() {
       var _this = this;
       var req = {
         component_id: this.component.id,
-        inspection_date: this.inspection_date,
+        inspection_date: this.inspectionDate,
         score: this.score
       };
       axios__WEBPACK_IMPORTED_MODULE_0___default().post("/inspections", req).then(function (response) {
-        // Reload the turbine data or trigger any necessary state updates
-        alert(response.data.message);
+        // emit turbines response to trigger update
         _this.$emit("updateTurbines", response.data.turbines);
-        var modal = document.getElementById("add_inspection_modal");
-        modal.close();
+
+        // empty fields
+        _this.inspectionDate = "";
+        _this["this"] // close modal
+        .closeModal();
+
+        // alert to show inspection is created
+        alert(response.data.message);
       })["catch"](function (error) {
         // Handle error
         console.error("Error submitting component:", error);
       });
     },
+    // close modal
     closeModal: function closeModal() {
       var modal = document.getElementById("add_inspection_modal");
       modal.close();
@@ -24245,17 +24276,20 @@ __webpack_require__.r(__webpack_exports__);
         longitude: this.longitude
       };
       axios__WEBPACK_IMPORTED_MODULE_0___default().post("/turbines", req).then(function (response) {
-        // Reload the turbine data or trigger any necessary state updates
-        console.log(response);
-        alert(response.data.message);
+        // trigger turbines update
         _this.$emit("updateTurbines", response.data.turbines);
-        var modal = document.getElementById("add_turbine_modal");
-        modal.close();
+
+        // close modal
+        _this.closeModal();
+
+        // alert showing turbine has been created
+        alert(response.data.message);
       })["catch"](function (error) {
         // Handle error
         console.error("Error submitting component:", error);
       });
     },
+    // close modal
     closeModal: function closeModal() {
       var modal = document.getElementById("add_turbine_modal");
       modal.close();
@@ -24284,14 +24318,19 @@ __webpack_require__.r(__webpack_exports__);
     selectedComponent: Object
   },
   methods: {
+    // delete component
     deleteComponent: function deleteComponent(id) {
       var _this = this;
       axios__WEBPACK_IMPORTED_MODULE_0___default()["delete"]("/components/".concat(id)).then(function (response) {
-        // Reload the turbine data or trigger any necessary state updates
-        alert(response.data.message);
+        // emit change to parent to update turbines
         _this.$emit("updateTurbines", response.data.turbines);
+
+        // close modal
         var modal = document.getElementById("delete_component_modal");
         modal.close();
+
+        // alert to show component has been deleted
+        alert(response.data.message);
       })["catch"](function (error) {
         // Handle error
         console.error("Error submitting component:", error);
@@ -24322,12 +24361,19 @@ __webpack_require__.r(__webpack_exports__);
     selectedInspection: Object
   },
   methods: {
+    // delete inspection on component
     deleteInspection: function deleteInspection(id) {
       var _this = this;
       axios__WEBPACK_IMPORTED_MODULE_0___default()["delete"]("/inspections/".concat(id)).then(function (response) {
+        // emit to parent to get new turbine data
         _this.$emit("updateTurbines", response.data.turbines);
+
+        // close modal
         var modal = document.getElementById("delete_inspection_modal");
         modal.close();
+
+        // alert to show component has been deleted
+        alert(response.data.message);
       })["catch"](function (error) {
         // Handle error
         console.error("Error submitting component:", error);
@@ -24357,14 +24403,19 @@ __webpack_require__.r(__webpack_exports__);
     selectedTurbine: Object
   },
   methods: {
+    // delete turbine
     deleteTurbine: function deleteTurbine(id) {
       var _this = this;
       axios__WEBPACK_IMPORTED_MODULE_0___default()["delete"]("/turbines/".concat(id)).then(function (response) {
-        // Reload the turbine data or trigger any necessary state updates
-        alert(response.data.message);
+        // emit to parent to get new turbine data
         _this.$emit("updateTurbines", response.data.turbines);
+
+        // close modal
         var modal = document.getElementById("delete_turbine_modal");
         modal.close();
+
+        // alert to show turbine has been deleted
+        alert(response.data.message);
       })["catch"](function (error) {
         // Handle error
         console.error("Error submitting component:", error);
@@ -24474,7 +24525,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
         "layer-type": "base",
         name: "OpenStreetMap"
-      }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Add markers for each turbine "), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.turbines, function (turbine) {
+      }), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.turbines, function (turbine) {
         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_l_marker, {
           key: turbine.id,
           "lat-lng": [turbine.latitude, turbine.longitude],
@@ -24701,11 +24752,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   }, "Inspection Date")], -1 /* HOISTED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "date",
     "onUpdate:modelValue": _cache[0] || (_cache[0] = function ($event) {
-      return $data.inspection_date = $event;
+      return $data.inspectionDate = $event;
     }),
     "class": "input input-bordered w-full",
     required: ""
-  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.inspection_date]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [_cache[5] || (_cache[5] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.inspectionDate]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [_cache[5] || (_cache[5] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "class": "label"
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     "class": "label-text"
@@ -24942,7 +24993,7 @@ var _hoisted_5 = {
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   return $props.selectedTurbine ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("dialog", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h3", _hoisted_3, " Are you sure you want to delete this turbine? - " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.selectedTurbine.id) + ". " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.selectedTurbine.name), 1 /* TEXT */), _cache[2] || (_cache[2] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
     "class": "py-4"
-  }, "Click 'Delete' to confirm, or 'Close' to cancel", -1 /* HOISTED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" if there is a button in form, it will close the modal "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  }, "Click 'Delete' to confirm, or 'Close' to cancel", -1 /* HOISTED */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     onClick: _cache[0] || (_cache[0] = function ($event) {
       return $options.deleteTurbine($props.selectedTurbine.id);
     }),

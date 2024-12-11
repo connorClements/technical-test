@@ -16,9 +16,10 @@ class ComponentFactory extends Factory
 
     public function definition()
     {
+        // 4 random component names of parts of wind turbines
         return [
             'name' => $this->faker->randomElement(['Blade', 'Nacelle', 'Hub', 'Tower']),
-            'turbine_id' => Turbine::factory(), // Creates a turbine when generating a component
+            'turbine_id' => Turbine::factory(),
         ];
     }
 }

@@ -26,7 +26,6 @@
                         layer-type="base"
                         name="OpenStreetMap"
                     ></l-tile-layer>
-                    <!-- Add markers for each turbine -->
                     <l-marker
                         v-for="turbine in turbines"
                         :key="turbine.id"
@@ -251,6 +250,7 @@ export default {
     },
     data() {
         return {
+            // leaflet data
             zoom: 2,
             defaultCenter: [47.41322, -1.219482],
             iconSize: 32,
@@ -259,19 +259,22 @@ export default {
                 iconSize: [32, 37],
                 iconAnchor: [16, 37],
             }),
-
+            // selected turbine/id/component/inspection for showing/hiding parts of page
             selectedTurbine: null,
             selectedTurbineId: null,
             selectedComponent: null,
             selectedInspection: null,
+            // turbines array
             turbines: [],
         };
     },
 
     created() {
+        // on page creation, fetch turbine data
         this.fetchTurbines();
     },
     computed: {
+        // icon size and anchor on map
         dynamicSize() {
             return [this.iconSize, this.iconSize * 1.15];
         },
@@ -281,6 +284,7 @@ export default {
     },
 
     methods: {
+        // get turbines (ensure they are empty and reload when fetching new data so component/incpection changes load through)
         fetchTurbines() {
             this.turbines = [];
             axios
@@ -288,12 +292,14 @@ export default {
                 .then((resp) => {
                     this.turbines = resp.data.turbines;
 
+                    // re-select turbine so table doesn't disappear at bottom on update/deletion of components/inspections
                     if (this.selectedTurbineId) {
                         const turbine = this.turbines.find(
                             (t) => t.id === this.selectedTurbineId
                         );
                         if (turbine) {
-                            this.selectedTurbine = turbine; // Reselect the turbine
+                            // reselect the turbine
+                            this.selectedTurbine = turbine;
                         }
                     }
                 })
@@ -303,40 +309,47 @@ export default {
         },
 
         updateTurbines(newTurbines) {
-            // Update the turbines data when the event is emitted
+            // update the turbines data when the event is emitted
             this.fetchTurbines();
         },
 
+        // select specific turbine on click - for table
         selectTurbine(turbine) {
             console.log(turbine);
             this.selectedTurbine = turbine;
             this.selectedTurbineId = turbine.id;
         },
 
+        // select specific component on click - for modal
         selectComponent(component) {
             this.selectedComponent = component;
             document.getElementById("delete_component_modal").showModal();
         },
 
+        // select specific component on click - for modal
         addInspection(component) {
             this.selectedComponent = component;
             document.getElementById("add_inspection_modal").showModal();
         },
 
+        // select specific turbine on click - for modal
         addComponent(turbine) {
             this.selectedTurbine = turbine;
             document.getElementById("add_component_modal").showModal();
         },
 
+        // show 'add turbine' modal
         addTurbine() {
             document.getElementById("add_turbine_modal").showModal();
         },
 
+        // select inspection for deletion and show modal
         selectInspection(inspection) {
             this.selectedInspection = inspection;
             document.getElementById("delete_inspection_modal").showModal();
         },
 
+        // show components/inspections table
         viewInspections() {
             // Scroll to the table with a smooth effect
             const table = document.getElementById("inspectionsTable");

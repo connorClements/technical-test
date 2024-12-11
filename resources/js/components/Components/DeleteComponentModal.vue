@@ -31,19 +31,22 @@ export default {
     },
 
     methods: {
+        // delete component
         deleteComponent(id) {
             axios
                 .delete(`/components/${id}`)
                 .then((response) => {
-                    // Reload the turbine data or trigger any necessary state updates
-                    alert(response.data.message);
-
+                    // emit change to parent to update turbines
                     this.$emit("updateTurbines", response.data.turbines);
 
+                    // close modal
                     const modal = document.getElementById(
                         "delete_component_modal"
                     );
                     modal.close();
+
+                    // alert to show component has been deleted
+                    alert(response.data.message);
                 })
                 .catch((error) => {
                     // Handle error

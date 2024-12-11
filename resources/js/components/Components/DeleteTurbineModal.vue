@@ -8,7 +8,6 @@
             <p class="py-4">Click 'Delete' to confirm, or 'Close' to cancel</p>
             <div class="modal-action">
                 <form method="dialog">
-                    <!-- if there is a button in form, it will close the modal -->
                     <button
                         @click="deleteTurbine(selectedTurbine.id)"
                         class="btn bg-red-500 text-slate-50 mr-1"
@@ -31,19 +30,22 @@ export default {
     },
 
     methods: {
+        // delete turbine
         deleteTurbine(id) {
             axios
                 .delete(`/turbines/${id}`)
                 .then((response) => {
-                    // Reload the turbine data or trigger any necessary state updates
-                    alert(response.data.message);
-
+                    // emit to parent to get new turbine data
                     this.$emit("updateTurbines", response.data.turbines);
 
+                    // close modal
                     const modal = document.getElementById(
                         "delete_turbine_modal"
                     );
                     modal.close();
+
+                    // alert to show turbine has been deleted
+                    alert(response.data.message);
                 })
                 .catch((error) => {
                     // Handle error

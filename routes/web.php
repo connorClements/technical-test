@@ -18,6 +18,7 @@ use App\Http\Controllers\InspectionController;
 |
 */
 
+// homepage
 Route::get('/', function () {
     return view('app');
 });

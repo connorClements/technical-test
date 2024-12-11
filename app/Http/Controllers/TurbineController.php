@@ -15,6 +15,7 @@ class TurbineController extends Controller
      */
     public function index()
     {
+        // return turbines with components and inspections attached
         $turbines = Turbine::with(['components.inspections'])->get();
 
         // Return turbines as JSON
@@ -29,15 +30,20 @@ class TurbineController extends Controller
      */
     public function store(Request $request)
     {
+        /**
+         * validate turbine creation, with name, latitude (between -90 and 90 deg)
+         *  and longitude (between -180 and 180 deg)
+         */
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
         ]);
 
-        $turbine = Turbine::create($validated);
+        // create turbine from validated data
+        Turbine::create($validated);
 
-        // Return the newly created turbine and all turbines as JSON
+        // return the newly created turbine and all turbines as JSON
         $turbines = Turbine::with(['components.inspections'])->get();
         return response()->json([
             'message' => 'Turbine created successfully.',
@@ -54,15 +60,17 @@ class TurbineController extends Controller
      */
     public function update(Request $request, Turbine $turbine)
     {
+        // validate turbine 
         $validated = $request->validate([
-            'name' => 'sometimes|string|max:255',
-            'latitude' => 'sometimes|numeric|between:-90,90',
-            'longitude' => 'sometimes|numeric|between:-180,180',
+            'name' => 'required|string|max:255',
+            'latitude' => 'required|numeric|between:-90,90',
+            'longitude' => 'required|numeric|between:-180,180',
         ]);
 
+        // update turbine
         $turbine->update($validated);
 
-        // Return updated turbines as JSON
+        // return updated turbines as JSON
         $turbines = Turbine::with(['components.inspections'])->get();
         return response()->json([
             'message' => 'Turbine updated successfully.',
@@ -78,10 +86,13 @@ class TurbineController extends Controller
      */
     public function destroy(Turbine $turbine)
     {
+        // delte turbine
         $turbine->delete();
 
+        // get all turbines
         $turbines = Turbine::with(['components.inspections'])->get();
 
+        // return all turbines as JSON 
         return response()->json([
             'message' => 'Turbine deleted successfully.',
             'turbines' => $turbines,

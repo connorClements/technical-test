@@ -17,15 +17,16 @@ class InspectionController extends Controller
      */
     public function store(Request $request)
     {
+        // validate inspection, including score must be between 1 and 5
         $validated = $request->validate([
             'component_id' => 'required',
             'inspection_date' => 'required|date',
             'score' => 'required|integer|min:1|max:5',
         ]);
 
+        // Get component and create inspection for it
         $component = Component::where('id', $validated['component_id'])->first();
-
-        $inspection = $component->inspections()->create($validated);
+        $component->inspections()->create($validated);
 
         // Return updated turbines as JSON
         $turbines = Turbine::with(['components.inspections'])->get();
@@ -43,11 +44,13 @@ class InspectionController extends Controller
      */
     public function update(Request $request, Inspection $inspection)
     {
+        // validate updating/amending date of inspection
         $validated = $request->validate([
-            'inspection_date' => 'sometimes|date',
+            'inspection_date' => 'required|date',
             'score' => 'sometimes|integer|min:1|max:5',
         ]);
 
+        // update the inspection
         $inspection->update($validated);
 
         // Return updated turbines as JSON
@@ -65,6 +68,7 @@ class InspectionController extends Controller
      */
     public function destroy(Inspection $inspection)
     {
+        // delete the inspection
         $inspection->delete();
 
         // Return updated turbines as JSON

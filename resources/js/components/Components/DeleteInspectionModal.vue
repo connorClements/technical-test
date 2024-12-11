@@ -33,17 +33,22 @@ export default {
     },
 
     methods: {
+        // delete inspection on component
         deleteInspection(id) {
             axios
                 .delete(`/inspections/${id}`)
                 .then((response) => {
+                    // emit to parent to get new turbine data
                     this.$emit("updateTurbines", response.data.turbines);
 
+                    // close modal
                     const modal = document.getElementById(
                         "delete_inspection_modal"
                     );
-
                     modal.close();
+
+                    // alert to show component has been deleted
+                    alert(response.data.message);
                 })
                 .catch((error) => {
                     // Handle error

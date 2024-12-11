@@ -15,7 +15,9 @@ class TurbineSeeder extends Seeder
      */
     public function run()
     {
-        // Create 10 turbines
+        /**
+         * Create 10 turbines, with 4 componets and 4 inspections on each component
+         */
         Turbine::factory()
             ->count(100)
             ->hasComponents(4)

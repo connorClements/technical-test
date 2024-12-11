@@ -38,7 +38,7 @@ import axios from "axios";
 
 export default {
     props: {
-        turbine: Object, // The ID of the component to add the inspection for
+        turbine: Object,
     },
     data() {
         return {
@@ -46,6 +46,7 @@ export default {
         };
     },
     methods: {
+        // submit new component as axios post request
         submitComponent() {
             const req = {
                 turbine_id: this.turbine.id,
@@ -55,16 +56,19 @@ export default {
             axios
                 .post("/components", req)
                 .then((response) => {
-                    // Reload the turbine data or trigger any necessary state updates
-
+                    // emit turbines, which will trigger overall turbines update on parent
                     this.$emit("updateTurbines", response.data.turbines);
 
-                    const modal = document.getElementById(
-                        "add_component_modal"
-                    );
-                    modal.close();
+                    // empty fields
+                    this.name = "";
 
+                    // close modal
+                    this.closeModal();
+
+                    // alert to show component is updated
                     alert(response.data.message);
+
+                    this.name = "";
                 })
                 .catch((error) => {
                     // Handle error
@@ -72,6 +76,7 @@ export default {
                 });
         },
 
+        // close modal
         closeModal() {
             const modal = document.getElementById("add_component_modal");
             modal.close();

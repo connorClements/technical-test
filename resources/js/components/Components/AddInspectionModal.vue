@@ -11,7 +11,7 @@
                     </label>
                     <input
                         type="date"
-                        v-model="inspection_date"
+                        v-model="inspectionDate"
                         class="input input-bordered w-full"
                         required
                     />
@@ -56,30 +56,32 @@ export default {
     },
     data() {
         return {
-            inspection_date: "",
+            inspectionDate: "",
             score: "",
         };
     },
     methods: {
+        // submit new inspection as POST
         submitInspection() {
             const req = {
                 component_id: this.component.id,
-                inspection_date: this.inspection_date,
+                inspection_date: this.inspectionDate,
                 score: this.score,
             };
 
             axios
                 .post("/inspections", req)
                 .then((response) => {
-                    // Reload the turbine data or trigger any necessary state updates
-                    alert(response.data.message);
-
+                    // emit turbines response to trigger update
                     this.$emit("updateTurbines", response.data.turbines);
 
-                    const modal = document.getElementById(
-                        "add_inspection_modal"
-                    );
-                    modal.close();
+                    // empty fields
+                    this.inspectionDate = "";
+                    this.this // close modal
+                        .closeModal();
+
+                    // alert to show inspection is created
+                    alert(response.data.message);
                 })
                 .catch((error) => {
                     // Handle error
@@ -87,6 +89,7 @@ export default {
                 });
         },
 
+        // close modal
         closeModal() {
             const modal = document.getElementById("add_inspection_modal");
             modal.close();
