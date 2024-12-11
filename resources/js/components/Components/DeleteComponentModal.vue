@@ -23,8 +23,7 @@
     </dialog>
 </template>
 <script>
-import { Inertia } from "@inertiajs/inertia";
-import { router } from "@inertiajs/vue3";
+import axios from "axios";
 
 export default {
     props: {
@@ -33,17 +32,23 @@ export default {
 
     methods: {
         deleteComponent(id) {
-            Inertia.delete(`/components/${id}`, {
-                onSuccess: (response) => {
-                    router.reload({ only: ["turbines"] });
+            axios
+                .delete(`/components/${id}`)
+                .then((response) => {
+                    // Reload the turbine data or trigger any necessary state updates
+                    alert(response.data.message);
 
-                    console.log(response);
-                },
-                onError: (error) => {
-                    // Handle error (optional)
-                    console.error("Error deleting inspection:", error);
-                },
-            });
+                    this.$emit("updateTurbines", response.data.turbines);
+
+                    const modal = document.getElementById(
+                        "delete_component_modal"
+                    );
+                    modal.close();
+                })
+                .catch((error) => {
+                    // Handle error
+                    console.error("Error submitting component:", error);
+                });
         },
     },
 };

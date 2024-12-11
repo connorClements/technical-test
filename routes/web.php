@@ -19,7 +19,7 @@ use App\Http\Controllers\InspectionController;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('app');
 });
 
 

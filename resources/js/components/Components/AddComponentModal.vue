@@ -19,7 +19,7 @@
 
                 <div class="modal-action">
                     <button
-                        @click="submitComponent()"
+                        type="submit"
                         class="btn bg-green-500 text-white mr-1"
                     >
                         Add Component
@@ -34,8 +34,7 @@
 </template>
 
 <script>
-import { Inertia } from "@inertiajs/inertia";
-import { router } from "@inertiajs/vue3";
+import axios from "axios";
 
 export default {
     props: {
@@ -53,17 +52,24 @@ export default {
                 name: this.name,
             };
 
-            Inertia.post("/components", req, {
-                onSuccess: (response) => {
-                    router.reload({ only: ["turbines"] });
+            axios
+                .post("/components", req)
+                .then((response) => {
+                    // Reload the turbine data or trigger any necessary state updates
 
-                    console.log(response);
-                },
-                onError: (error) => {
-                    // Handle error (optional)
-                    console.error("Error deleting inspection:", error);
-                },
-            });
+                    this.$emit("updateTurbines", response.data.turbines);
+
+                    const modal = document.getElementById(
+                        "add_component_modal"
+                    );
+                    modal.close();
+
+                    alert(response.data.message);
+                })
+                .catch((error) => {
+                    // Handle error
+                    console.error("Error submitting component:", error);
+                });
         },
 
         closeModal() {

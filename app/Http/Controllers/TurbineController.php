@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Inertia\Inertia;
 use App\Models\Turbine;
 use App\Models\Inspection;
 use Illuminate\Http\Request;
@@ -12,19 +11,16 @@ class TurbineController extends Controller
 
     /**
      * Summary of index
-     * @return \Inertia\Response
+     * @return mixed|\Illuminate\Http\JsonResponse
      */
     public function index()
     {
-        // Fetch turbines with their components and inspections
         $turbines = Turbine::with(['components.inspections'])->get();
 
-        // Return the turbines to the Inertia `/map` page
-        return Inertia::render('Turbines', [
-            'turbines' => $turbines,
-
-        ]);
+        // Return turbines as JSON
+        return response()->json(['turbines' => $turbines]);
     }
+
 
     /**
      * Summary of store
@@ -41,15 +37,14 @@ class TurbineController extends Controller
 
         $turbine = Turbine::create($validated);
 
-        // Fetch turbines with their components and inspections
+        // Return the newly created turbine and all turbines as JSON
         $turbines = Turbine::with(['components.inspections'])->get();
-
-        // Return the turbines to the Inertia `/map` page
-        return Inertia::render('Turbines', [
+        return response()->json([
+            'message' => 'Turbine created successfully.',
             'turbines' => $turbines,
-
         ]);
     }
+
 
     /**
      * Summary of update
@@ -67,20 +62,19 @@ class TurbineController extends Controller
 
         $turbine->update($validated);
 
-        // Fetch turbines with their components and inspections
+        // Return updated turbines as JSON
         $turbines = Turbine::with(['components.inspections'])->get();
-
-        // Return the turbines to the Inertia `/map` page
-        return Inertia::render('Turbines', [
+        return response()->json([
+            'message' => 'Turbine updated successfully.',
             'turbines' => $turbines,
-
         ]);
     }
+
 
     /**
      * Summary of destroy
      * @param \App\Models\Turbine $turbine
-     * @return \Inertia\Response
+     * @return mixed|\Illuminate\Http\JsonResponse
      */
     public function destroy(Turbine $turbine)
     {
@@ -88,6 +82,9 @@ class TurbineController extends Controller
 
         $turbines = Turbine::with(['components.inspections'])->get();
 
-        return to_route(route: 'turbines.index');
+        return response()->json([
+            'message' => 'Turbine deleted successfully.',
+            'turbines' => $turbines,
+        ]);
     }
 }

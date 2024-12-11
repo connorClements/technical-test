@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Inertia\Inertia;
 use App\Models\Turbine;
 use App\Models\Component;
 use Illuminate\Http\Request;
@@ -26,7 +25,13 @@ class ComponentController extends Controller
 
         $component = $turbine->components()->create($validated);
 
-        return to_route(route: 'turbines.index');
+        // Return updated turbines as JSON
+        $turbines = Turbine::with(['components.inspections'])->get();
+
+        return response()->json([
+            'message' => 'Component created successfully.',
+            'turbines' => $turbines,
+        ]);
     }
 
     /**
@@ -43,7 +48,13 @@ class ComponentController extends Controller
 
         $component->update($validated);
 
-        return to_route(route: 'turbines.index');
+        // Return updated turbines as JSON
+        $turbines = Turbine::with(['components.inspections'])->get();
+
+        return response()->json([
+            'message' => 'Component updated successfully.',
+            'turbines' => $turbines,
+        ]);
     }
 
     /**
@@ -55,6 +66,12 @@ class ComponentController extends Controller
     {
         $component->delete();
 
-        return to_route(route: 'turbines.index');
+        // Return updated turbines as JSON
+        $turbines = Turbine::with(['components.inspections'])->get();
+
+        return response()->json([
+            'message' => 'Component deleted successfully.',
+            'turbines' => $turbines,
+        ]);
     }
 }

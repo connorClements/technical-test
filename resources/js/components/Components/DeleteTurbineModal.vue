@@ -23,7 +23,7 @@
     </dialog>
 </template>
 <script>
-import { Inertia } from "@inertiajs/inertia";
+import axios from "axios";
 
 export default {
     props: {
@@ -32,8 +32,23 @@ export default {
 
     methods: {
         deleteTurbine(id) {
-            Inertia.delete(`/turbines/${id}`);
-            alert("Turbine has been deleted");
+            axios
+                .delete(`/turbines/${id}`)
+                .then((response) => {
+                    // Reload the turbine data or trigger any necessary state updates
+                    alert(response.data.message);
+
+                    this.$emit("updateTurbines", response.data.turbines);
+
+                    const modal = document.getElementById(
+                        "delete_turbine_modal"
+                    );
+                    modal.close();
+                })
+                .catch((error) => {
+                    // Handle error
+                    console.error("Error submitting component:", error);
+                });
         },
     },
 };

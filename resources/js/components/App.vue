@@ -1,12 +1,3 @@
-<script setup>
-const props = defineProps({
-    turbines: {
-        type: Array,
-        required: true,
-    },
-});
-</script>
-
 <template>
     <div
         class="dark:from-gray-900 dark:to-gray-700 bg-gradient-to-b from-slate-200 to-slate-100 min-h-screen"
@@ -27,6 +18,8 @@ const props = defineProps({
                     v-model:zoom="zoom"
                     :center="defaultCenter"
                     class="rounded-lg"
+                    :min-zoom="1"
+                    :max-zoom="8"
                 >
                     <l-tile-layer
                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -199,12 +192,27 @@ const props = defineProps({
                     </table>
                 </div>
             </div>
-            <DeleteComponentModal :selected-component="selectedComponent" />
-            <DeleteInspectionModal :selected-inspection="selectedInspection" />
-            <DeleteTurbineModal :selected-turbine="selectedTurbine" />
-            <AddInspectionModal :component="selectedComponent" />
-            <AddTurbineModal />
-            <AddComponentModal :turbine="selectedTurbine" />
+            <DeleteComponentModal
+                :selected-component="selectedComponent"
+                @update-turbines="updateTurbines"
+            />
+            <DeleteInspectionModal
+                :selected-inspection="selectedInspection"
+                @update-turbines="updateTurbines"
+            />
+            <DeleteTurbineModal
+                :selected-turbine="selectedTurbine"
+                @update-turbines="updateTurbines"
+            />
+            <AddInspectionModal
+                :component="selectedComponent"
+                @update-turbines="updateTurbines"
+            />
+            <AddTurbineModal @update-turbines="updateTurbines" />
+            <AddComponentModal
+                :turbine="selectedTurbine"
+                @update-turbines="updateTurbines"
+            />
         </div>
     </div>
 </template>
@@ -225,6 +233,7 @@ import DeleteTurbineModal from "./Components/DeleteTurbineModal.vue";
 import AddComponentModal from "./Components/AddComponentModal.vue";
 import AddInspectionModal from "./Components/AddInspectionModal.vue";
 import AddTurbineModal from "./Components/AddTurbineModal.vue";
+import axios from "axios";
 
 export default {
     components: {
@@ -252,11 +261,16 @@ export default {
             }),
 
             selectedTurbine: null,
+            selectedTurbineId: null,
             selectedComponent: null,
             selectedInspection: null,
+            turbines: [],
         };
     },
 
+    created() {
+        this.fetchTurbines();
+    },
     computed: {
         dynamicSize() {
             return [this.iconSize, this.iconSize * 1.15];
@@ -267,9 +281,36 @@ export default {
     },
 
     methods: {
+        fetchTurbines() {
+            this.turbines = [];
+            axios
+                .get("/turbines")
+                .then((resp) => {
+                    this.turbines = resp.data.turbines;
+
+                    if (this.selectedTurbineId) {
+                        const turbine = this.turbines.find(
+                            (t) => t.id === this.selectedTurbineId
+                        );
+                        if (turbine) {
+                            this.selectedTurbine = turbine; // Reselect the turbine
+                        }
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error fetching turbines:", error);
+                });
+        },
+
+        updateTurbines(newTurbines) {
+            // Update the turbines data when the event is emitted
+            this.fetchTurbines();
+        },
+
         selectTurbine(turbine) {
             console.log(turbine);
             this.selectedTurbine = turbine;
+            this.selectedTurbineId = turbine.id;
         },
 
         selectComponent(component) {

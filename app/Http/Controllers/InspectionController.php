@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Inertia\Inertia;
 use App\Models\Turbine;
 use App\Models\Component;
 use App\Models\Inspection;
@@ -28,7 +27,12 @@ class InspectionController extends Controller
 
         $inspection = $component->inspections()->create($validated);
 
-        return to_route(route: 'turbines.index');
+        // Return updated turbines as JSON
+        $turbines = Turbine::with(['components.inspections'])->get();
+        return response()->json([
+            'message' => 'Inspection created successfully.',
+            'turbines' => $turbines,
+        ]);
     }
 
     /**
@@ -46,7 +50,12 @@ class InspectionController extends Controller
 
         $inspection->update($validated);
 
-        return to_route(route: 'turbines.index');
+        // Return updated turbines as JSON
+        $turbines = Turbine::with(['components.inspections'])->get();
+        return response()->json([
+            'message' => 'Inspection created successfully.',
+            'turbines' => $turbines,
+        ]);
     }
 
     /**
@@ -58,7 +67,12 @@ class InspectionController extends Controller
     {
         $inspection->delete();
 
-        // Return the updated turbines as a JSON response
-        return to_route(route: 'turbines.index');
+        // Return updated turbines as JSON
+        $turbines = Turbine::with(['components.inspections'])->get();
+
+        return response()->json([
+            'message' => 'Inspection deleted successfully.',
+            'turbines' => $turbines,
+        ]);
     }
 }
