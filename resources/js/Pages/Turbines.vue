@@ -1,0 +1,308 @@
+<script setup>
+const props = defineProps({
+    turbines: {
+        type: Array,
+        required: true,
+    },
+});
+</script>
+
+<template>
+    <div
+        class="dark:from-gray-900 dark:to-gray-700 bg-gradient-to-b from-slate-200 to-slate-100 min-h-screen"
+    >
+        <div class="text-4xl text-center p-6 text-gray-900 dark:text-slate-200">
+            Turbine Map
+        </div>
+        <div class="h-100">
+            <div class="shadow-lg h-[70vh] w-[70vw] mx-auto">
+                <button
+                    @click="addTurbine()"
+                    class="bg-green-500 hover:bg-green-400 text-sm text-white font-bold p-2 border-b-2 border-green-700 hover:border-green-500 rounded my-2"
+                >
+                    Add turbine
+                </button>
+                <l-map
+                    ref="map"
+                    v-model:zoom="zoom"
+                    :center="defaultCenter"
+                    class="rounded-lg"
+                >
+                    <l-tile-layer
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                        layer-type="base"
+                        name="OpenStreetMap"
+                    ></l-tile-layer>
+                    <!-- Add markers for each turbine -->
+                    <l-marker
+                        v-for="turbine in turbines"
+                        :key="turbine.id"
+                        :lat-lng="[turbine.latitude, turbine.longitude]"
+                        @click="selectTurbine(turbine)"
+                    >
+                        <l-popup class="text-center">
+                            <div class="text-base font-bold pb-1">
+                                Turbine: {{ turbine.id }}. {{ turbine.name }}
+                            </div>
+                            <div class="text-base pb-2">
+                                Coordinates: [{{ turbine.latitude }},
+                                {{ turbine.longitude }}]
+                            </div>
+                            <button
+                                @click="viewInspections(turbine)"
+                                class="bg-cyan-500 hover:bg-cyan-400 text-white font-bold py-2 px-4 border-b-4 border-cyan-700 hover:border-cyan-500 rounded mr-2"
+                            >
+                                View inspections
+                            </button>
+                            <button
+                                onclick="delete_turbine_modal.showModal()"
+                                class="bg-red-500 hover:bg-red-400 text-white font-bold py-2 px-4 border-b-4 border-red-700 hover:border-red-500 rounded"
+                            >
+                                Delete turbine
+                            </button>
+                        </l-popup>
+                        <l-icon
+                            :icon-size="dynamicSize"
+                            :icon-anchor="dynamicAnchor"
+                            icon-url="/images/turbine.png"
+                        >
+                        </l-icon>
+                    </l-marker>
+                </l-map>
+            </div>
+            <div v-if="selectedTurbine" id="inspectionsTable" class="mt-8 p-8">
+                <h2
+                    class="text-2xl font-semibold my-4 text-slate-300 text-center"
+                >
+                    Inspections for Turbine: {{ selectedTurbine.id }}.
+                    {{ selectedTurbine.name }}
+                </h2>
+                <button
+                    @click="addComponent(selectedTurbine)"
+                    class="bg-green-500 hover:bg-green-400 text-sm text-white font-bold p-2 border-b-2 border-green-700 hover:border-green-500 rounded my-2"
+                >
+                    Add component
+                </button>
+                <div class="overflow-x-auto">
+                    <table
+                        class="relative w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400"
+                    >
+                        <thead
+                            class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
+                        >
+                            <tr>
+                                <th class="border border-slate-300 px-4 py-2">
+                                    Component
+                                </th>
+                                <th class="border border-slate-300 px-4 py-2">
+                                    Date
+                                </th>
+                                <th class="border border-slate-300 px-4 py-2">
+                                    Score
+                                </th>
+                                <th class="border border-slate-300 px-4 py-2">
+                                    Inspection Actions
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr
+                                v-for="component in selectedTurbine.components"
+                                :key="component.id"
+                                class="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
+                            >
+                                <td class="border border-slate-300 px-4 py-2">
+                                    <div
+                                        class="px-2 py-4 font-medium text-lg text-gray-900 whitespace-nowrap dark:text-white"
+                                    >
+                                        {{ component.name }}
+                                    </div>
+                                    <div>
+                                        <button
+                                            @click="addInspection(component)"
+                                            class="bg-amber-500 hover:bg-amber-400 text-sm text-white font-bold p-2 border-b-2 border-amber-700 hover:border-amber-500 rounded m-1"
+                                        >
+                                            Add inspection
+                                        </button>
+                                        <button
+                                            @click="selectComponent(component)"
+                                            class="bg-red-500 hover:bg-red-400 text-sm text-white font-bold p-2 border-b-2 border-red-700 hover:border-red-500 rounded m-1"
+                                        >
+                                            Delete component
+                                        </button>
+                                    </div>
+                                </td>
+                                <td class="border border-slate-300">
+                                    <div
+                                        v-for="(
+                                            inspection, index
+                                        ) in component.inspections"
+                                        :key="inspection.id"
+                                        :class="{
+                                            'border-b-2 border-slate-300':
+                                                index !==
+                                                component.inspections.length -
+                                                    1,
+                                            'p-2': true,
+                                        }"
+                                        style="height: 64px"
+                                    >
+                                        {{ inspection.inspection_date }}
+                                    </div>
+                                </td>
+                                <td class="border border-slate-300">
+                                    <div
+                                        v-for="(
+                                            inspection, index
+                                        ) in component.inspections"
+                                        :key="inspection.id"
+                                        :class="{
+                                            'border-b-2 border-slate-300':
+                                                index !==
+                                                component.inspections.length -
+                                                    1,
+                                            'p-2': true,
+                                        }"
+                                        style="height: 64px"
+                                    >
+                                        {{ inspection.score }}
+                                    </div>
+                                </td>
+                                <td class="border border-slate-300">
+                                    <div
+                                        v-for="(
+                                            inspection, index
+                                        ) in component.inspections"
+                                        :key="inspection.id"
+                                        :class="{
+                                            'border-b-2 border-slate-300':
+                                                index !==
+                                                component.inspections.length -
+                                                    1,
+                                            'p-2': true,
+                                        }"
+                                    >
+                                        <div class="flex flex-row">
+                                            <button
+                                                @click="
+                                                    selectInspection(inspection)
+                                                "
+                                                class="bg-red-500 hover:bg-red-400 text-sm text-white font-bold p-2 border-b-2 border-red-700 hover:border-red-500 rounded m-1"
+                                            >
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <DeleteComponentModal :selected-component="selectedComponent" />
+            <DeleteInspectionModal :selected-inspection="selectedInspection" />
+            <DeleteTurbineModal :selected-turbine="selectedTurbine" />
+            <AddInspectionModal :component="selectedComponent" />
+            <AddTurbineModal />
+            <AddComponentModal :turbine="selectedTurbine" />
+        </div>
+    </div>
+</template>
+
+<script>
+import "leaflet/dist/leaflet.css";
+import {
+    LMap,
+    LTileLayer,
+    LMarker,
+    LPopup,
+    LIcon,
+} from "@vue-leaflet/vue-leaflet";
+import L from "leaflet";
+import DeleteComponentModal from "./Components/DeleteComponentModal.vue";
+import DeleteInspectionModal from "./Components/DeleteInspectionModal.vue";
+import DeleteTurbineModal from "./Components/DeleteTurbineModal.vue";
+import AddComponentModal from "./Components/AddComponentModal.vue";
+import AddInspectionModal from "./Components/AddInspectionModal.vue";
+import AddTurbineModal from "./Components/AddTurbineModal.vue";
+
+export default {
+    components: {
+        LMap,
+        LTileLayer,
+        LMarker,
+        LPopup,
+        LIcon,
+        DeleteComponentModal,
+        DeleteInspectionModal,
+        DeleteTurbineModal,
+        AddComponentModal,
+        AddInspectionModal,
+        AddTurbineModal,
+    },
+    data() {
+        return {
+            zoom: 2,
+            defaultCenter: [47.41322, -1.219482],
+            iconSize: 32,
+            icon: L.icon({
+                iconUrl: "/images/turbine.png",
+                iconSize: [32, 37],
+                iconAnchor: [16, 37],
+            }),
+
+            selectedTurbine: null,
+            selectedComponent: null,
+            selectedInspection: null,
+        };
+    },
+
+    computed: {
+        dynamicSize() {
+            return [this.iconSize, this.iconSize * 1.15];
+        },
+        dynamicAnchor() {
+            return [this.iconSize / 2, this.iconSize * 1.15];
+        },
+    },
+
+    methods: {
+        selectTurbine(turbine) {
+            console.log(turbine);
+            this.selectedTurbine = turbine;
+        },
+
+        selectComponent(component) {
+            this.selectedComponent = component;
+            document.getElementById("delete_component_modal").showModal();
+        },
+
+        addInspection(component) {
+            this.selectedComponent = component;
+            document.getElementById("add_inspection_modal").showModal();
+        },
+
+        addComponent(turbine) {
+            this.selectedTurbine = turbine;
+            document.getElementById("add_component_modal").showModal();
+        },
+
+        addTurbine() {
+            document.getElementById("add_turbine_modal").showModal();
+        },
+
+        selectInspection(inspection) {
+            this.selectedInspection = inspection;
+            document.getElementById("delete_inspection_modal").showModal();
+        },
+
+        viewInspections() {
+            // Scroll to the table with a smooth effect
+            const table = document.getElementById("inspectionsTable");
+            if (table) {
+                table.scrollIntoView({ behavior: "smooth" });
+            }
+        },
+    },
+};
+</script>

@@ -6,6 +6,7 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     {{-- Import tailwind --}}
     <link href="{{ mix('css/app.css') }}" rel="stylesheet">
+    @inertiaHead
 
 </head>
 <body>
