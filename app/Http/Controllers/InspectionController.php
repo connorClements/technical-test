@@ -56,7 +56,7 @@ class InspectionController extends Controller
         // Return updated turbines as JSON
         $turbines = Turbine::with(['components.inspections'])->get();
         return response()->json([
-            'message' => 'Inspection created successfully.',
+            'message' => 'Inspection updated successfully.',
             'turbines' => $turbines,
         ]);
     }
