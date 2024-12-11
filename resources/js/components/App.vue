@@ -2,9 +2,20 @@
     <div
         class="dark:from-gray-900 dark:to-gray-700 bg-gradient-to-b from-slate-200 to-slate-100 min-h-screen"
     >
-        <div class="text-4xl text-center p-6 text-gray-900 dark:text-slate-200">
-            Turbine Map
+        <div class="flex flex-col items-center text-center">
+            <img src="/images/cyberhawk-logo.png" class="pt-4 w-[200px]" />
+            <div
+                class="text-2xl text-center pt-2 text-gray-900 dark:text-slate-200"
+            >
+                Technical Task
+            </div>
+            <div
+                class="text-lg text-center pb-2 text-gray-900 dark:text-slate-400"
+            >
+                Connor Clements
+            </div>
         </div>
+
         <div class="h-100">
             <div class="shadow-lg h-[70vh] w-[70vw] mx-auto">
                 <button
