@@ -20,7 +20,6 @@ class TurbineSeeder extends Seeder
          */
         Turbine::factory()
             ->count(50)
-            ->hasComponents(4)
             ->create()
             ->each(function ($turbine) {
                 $components = ['Blade', 'Nacelle', 'Hub', 'Tower'];
