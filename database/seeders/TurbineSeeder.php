@@ -19,7 +19,7 @@ class TurbineSeeder extends Seeder
          * Create 10 turbines, with 4 componets and 4 inspections on each component
          */
         Turbine::factory()
-            ->count(100)
+            ->count(50)
             ->hasComponents(4)
             ->create()
             ->each(function ($turbine) {

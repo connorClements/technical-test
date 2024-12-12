@@ -22,7 +22,7 @@
                         type="submit"
                         class="btn bg-green-500 text-white mr-1"
                     >
-                        Add Component
+                        <i class="fas fa-plus mr-1"></i> Add Component
                     </button>
                     <button @click="closeModal()" type="button" class="btn">
                         Close
@@ -35,8 +35,13 @@
 
 <script>
 import axios from "axios";
+import iziToast from "izitoast";
 
 export default {
+    components: {
+        iziToast,
+    },
+
     props: {
         turbine: Object,
     },
@@ -65,8 +70,13 @@ export default {
                     // close modal
                     this.closeModal();
 
-                    // alert to show component is updated
-                    alert(response.data.message);
+                    iziToast.show({
+                        title: "Success",
+                        color: "green",
+                        position: "topCenter",
+                        timeout: 3000,
+                        message: response.data.message,
+                    });
 
                     this.name = "";
                 })

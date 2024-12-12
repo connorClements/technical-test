@@ -44,9 +44,11 @@
                         type="submit"
                         class="btn bg-green-500 text-white mr-1"
                     >
-                        Add Turbine
+                        <i class="fas fa-plus mr-1"></i> Add Turbine
                     </button>
-                    <button @click="closeModal()" class="btn">Close</button>
+                    <button @click="closeModal()" type="button" class="btn">
+                        Close
+                    </button>
                 </div>
             </form>
         </div>
@@ -55,8 +57,12 @@
 
 <script>
 import axios from "axios";
+import iziToast from "izitoast";
 
 export default {
+    components: {
+        iziToast,
+    },
     data() {
         return {
             name: "",
@@ -82,7 +88,13 @@ export default {
                     this.closeModal();
 
                     // alert showing turbine has been created
-                    alert(response.data.message);
+                    iziToast.show({
+                        title: "Success",
+                        color: "green",
+                        position: "topCenter",
+                        timeout: 3000,
+                        message: response.data.message,
+                    });
                 })
                 .catch((error) => {
                     // Handle error

@@ -1453,9 +1453,6 @@ html {
 .mr-1 {
   margin-right: 0.25rem;
 }
-.mr-2 {
-  margin-right: 0.5rem;
-}
 .mt-8 {
   margin-top: 2rem;
 }
@@ -1471,14 +1468,14 @@ html {
 .min-h-screen {
   min-height: 100vh;
 }
+.w-\[200px\] {
+  width: 200px;
+}
 .w-\[70vw\] {
   width: 70vw;
 }
 .w-full {
   width: 100%;
-}
-.w-\[200px\] {
-  width: 200px;
 }
 .flex-row {
   flex-direction: row;
@@ -1571,9 +1568,6 @@ html {
 .p-2 {
   padding: 0.5rem;
 }
-.p-6 {
-  padding: 1.5rem;
-}
 .p-8 {
   padding: 2rem;
 }
@@ -1615,10 +1609,6 @@ html {
   font-size: 1.5rem;
   line-height: 2rem;
 }
-.text-4xl {
-  font-size: 2.25rem;
-  line-height: 2.5rem;
-}
 .text-base {
   font-size: 1rem;
   line-height: 1.5rem;
@@ -1634,10 +1624,6 @@ html {
 .text-xs {
   font-size: 0.75rem;
   line-height: 1rem;
-}
-.text-xl {
-  font-size: 1.25rem;
-  line-height: 1.75rem;
 }
 .font-bold {
   font-weight: 700;
@@ -1752,14 +1738,14 @@ html {
     color: rgb(226 232 240 / var(--tw-text-opacity, 1));
   }
 
-  .dark\:text-white {
-    --tw-text-opacity: 1;
-    color: rgb(255 255 255 / var(--tw-text-opacity, 1));
-  }
-
   .dark\:text-slate-400 {
     --tw-text-opacity: 1;
     color: rgb(148 163 184 / var(--tw-text-opacity, 1));
+  }
+
+  .dark\:text-white {
+    --tw-text-opacity: 1;
+    color: rgb(255 255 255 / var(--tw-text-opacity, 1));
   }
 }
 

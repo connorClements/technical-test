@@ -1,15 +1,17 @@
 <template>
-    <dialog v-if="selectedTurbine" id="delete_turbine_modal" class="modal">
+    <dialog id="delete_inspection_modal" class="modal">
         <div class="modal-box">
-            <h3 class="text-lg font-bold">
-                Are you sure you want to delete this turbine? -
-                {{ selectedTurbine.id }}. {{ selectedTurbine.name }}
+            <h3 v-if="selectedInspection" class="text-lg font-bold">
+                Are you sure you want to delete this inspection? - date:
+                {{ selectedInspection.inspection_date }}, score:
+                {{ selectedInspection.score }}
             </h3>
             <p class="py-4">Click 'Delete' to confirm, or 'Close' to cancel</p>
             <div class="modal-action">
                 <form method="dialog">
+                    <!-- if there is a button in form, it will close the modal -->
                     <button
-                        @click="deleteTurbine(selectedTurbine.id)"
+                        @click="deleteInspection(selectedInspection.id)"
                         class="btn bg-red-500 text-slate-50 mr-1"
                     >
                         Delete
@@ -23,29 +25,39 @@
 </template>
 <script>
 import axios from "axios";
+import iziToast from "izitoast";
 
 export default {
+    components: {
+        iziToast,
+    },
+
     props: {
-        selectedTurbine: Object,
+        selectedInspection: Object,
     },
 
     methods: {
-        // delete turbine
-        deleteTurbine(id) {
+        // delete inspection on component
+        deleteInspection(id) {
             axios
-                .delete(`/turbines/${id}`)
+                .delete(`/inspections/${id}`)
                 .then((response) => {
                     // emit to parent to get new turbine data
                     this.$emit("updateTurbines", response.data.turbines);
 
                     // close modal
                     const modal = document.getElementById(
-                        "delete_turbine_modal"
+                        "delete_inspection_modal"
                     );
                     modal.close();
 
-                    // alert to show turbine has been deleted
-                    alert(response.data.message);
+                    iziToast.show({
+                        title: "Success",
+                        color: "red",
+                        position: "topCenter",
+                        timeout: 3000,
+                        message: response.data.message,
+                    });
                 })
                 .catch((error) => {
                     // Handle error

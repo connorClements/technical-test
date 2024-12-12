@@ -25,8 +25,8 @@
                         type="number"
                         v-model="score"
                         class="input input-bordered w-full"
-                        min="0"
-                        max="100"
+                        min="1"
+                        max="5"
                         required
                     />
                 </div>
@@ -36,7 +36,7 @@
                         type="submit"
                         class="btn bg-green-500 text-white mr-1"
                     >
-                        Add Inspection
+                        <i class="fas fa-plus mr-1"></i>Add Inspection
                     </button>
                     <button @click="closeModal()" type="button" class="btn">
                         Close
@@ -49,8 +49,12 @@
 
 <script>
 import axios from "axios";
+import iziToast from "izitoast";
 
 export default {
+    components: {
+        iziToast,
+    },
     props: {
         component: Object, // The ID of the component to add the inspection for
     },
@@ -77,11 +81,16 @@ export default {
 
                     // empty fields
                     this.inspectionDate = "";
-                    this.this // close modal
-                        .closeModal();
+                    this.score = "";
+                    this.closeModal();
 
-                    // alert to show inspection is created
-                    alert(response.data.message);
+                    iziToast.show({
+                        title: "Success",
+                        color: "green",
+                        position: "topCenter",
+                        timeout: 3000,
+                        message: response.data.message,
+                    });
                 })
                 .catch((error) => {
                     // Handle error

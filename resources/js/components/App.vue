@@ -22,7 +22,7 @@
                     @click="addTurbine()"
                     class="bg-green-500 hover:bg-green-400 text-sm text-white font-bold p-2 border-b-2 border-green-700 hover:border-green-500 rounded my-2"
                 >
-                    Add turbine
+                    <i class="fas fa-plus mr-1"></i>Add turbine
                 </button>
                 <l-map
                     ref="map"
@@ -53,15 +53,16 @@
                             </div>
                             <button
                                 @click="viewInspections(turbine)"
-                                class="bg-cyan-500 hover:bg-cyan-400 text-white font-bold py-2 px-4 border-b-4 border-cyan-700 hover:border-cyan-500 rounded mr-2"
+                                class="bg-cyan-500 hover:bg-cyan-400 text-white font-bold py-2 px-4 border-b-4 border-cyan-700 hover:border-cyan-500 rounded mr-1"
                             >
-                                View inspections
+                                <i class="far fa-eye mr-1"></i>View inspections
                             </button>
                             <button
                                 onclick="delete_turbine_modal.showModal()"
                                 class="bg-red-500 hover:bg-red-400 text-white font-bold py-2 px-4 border-b-4 border-red-700 hover:border-red-500 rounded"
                             >
-                                Delete turbine
+                                <i class="far fa-trash-can mr-1"></i> Delete
+                                turbine
                             </button>
                         </l-popup>
                         <l-icon
@@ -84,7 +85,7 @@
                     @click="addComponent(selectedTurbine)"
                     class="bg-green-500 hover:bg-green-400 text-sm text-white font-bold p-2 border-b-2 border-green-700 hover:border-green-500 rounded my-2"
                 >
-                    Add component
+                    <i class="fas fa-plus mr-1"></i> Add component
                 </button>
                 <div class="overflow-x-auto">
                     <table
@@ -125,12 +126,16 @@
                                             @click="addInspection(component)"
                                             class="bg-amber-500 hover:bg-amber-400 text-sm text-white font-bold p-2 border-b-2 border-amber-700 hover:border-amber-500 rounded m-1"
                                         >
-                                            Add inspection
+                                            <i class="fas fa-plus mr-1"></i> Add
+                                            inspection
                                         </button>
                                         <button
                                             @click="selectComponent(component)"
                                             class="bg-red-500 hover:bg-red-400 text-sm text-white font-bold p-2 border-b-2 border-red-700 hover:border-red-500 rounded m-1"
                                         >
+                                            <i
+                                                class="far fa-trash-can mr-1"
+                                            ></i>
                                             Delete component
                                         </button>
                                     </div>
@@ -192,7 +197,10 @@
                                                 "
                                                 class="bg-red-500 hover:bg-red-400 text-sm text-white font-bold p-2 border-b-2 border-red-700 hover:border-red-500 rounded m-1"
                                             >
-                                                Delete
+                                                <i
+                                                    class="far fa-trash-can mr-1"
+                                                ></i>
+                                                Delete inspection
                                             </button>
                                         </div>
                                     </div>
@@ -237,12 +245,12 @@ import {
     LIcon,
 } from "@vue-leaflet/vue-leaflet";
 import L from "leaflet";
-import DeleteComponentModal from "./Components/DeleteComponentModal.vue";
-import DeleteInspectionModal from "./Components/DeleteInspectionModal.vue";
-import DeleteTurbineModal from "./Components/DeleteTurbineModal.vue";
-import AddComponentModal from "./Components/AddComponentModal.vue";
-import AddInspectionModal from "./Components/AddInspectionModal.vue";
-import AddTurbineModal from "./Components/AddTurbineModal.vue";
+import DeleteComponentModal from "./Modals/DeleteComponentModal.vue";
+import DeleteInspectionModal from "./Modals/DeleteInspectionModal.vue";
+import DeleteTurbineModal from "./Modals/DeleteTurbineModal.vue";
+import AddComponentModal from "./Modals/AddComponentModal.vue";
+import AddInspectionModal from "./Modals/AddInspectionModal.vue";
+import AddTurbineModal from "./Modals/AddTurbineModal.vue";
 import axios from "axios";
 
 export default {

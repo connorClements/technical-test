@@ -1,16 +1,15 @@
 <template>
-    <dialog id="delete_component_modal" class="modal">
+    <dialog v-if="selectedTurbine" id="delete_turbine_modal" class="modal">
         <div class="modal-box">
-            <h3 v-if="selectedComponent" class="text-lg font-bold">
-                Are you sure you want to delete this component? -
-                {{ selectedComponent.name }}
+            <h3 class="text-lg font-bold">
+                Are you sure you want to delete this turbine? -
+                {{ selectedTurbine.id }}. {{ selectedTurbine.name }}
             </h3>
             <p class="py-4">Click 'Delete' to confirm, or 'Close' to cancel</p>
             <div class="modal-action">
                 <form method="dialog">
-                    <!-- if there is a button in form, it will close the modal -->
                     <button
-                        @click="deleteComponent(selectedComponent.id)"
+                        @click="deleteTurbine(selectedTurbine.id)"
                         class="btn bg-red-500 text-slate-50 mr-1"
                     >
                         Delete
@@ -24,29 +23,39 @@
 </template>
 <script>
 import axios from "axios";
+import iziToast from "izitoast";
 
 export default {
+    components: {
+        iziToast,
+    },
+
     props: {
-        selectedComponent: Object,
+        selectedTurbine: Object,
     },
 
     methods: {
-        // delete component
-        deleteComponent(id) {
+        // delete turbine
+        deleteTurbine(id) {
             axios
-                .delete(`/components/${id}`)
+                .delete(`/turbines/${id}`)
                 .then((response) => {
-                    // emit change to parent to update turbines
+                    // emit to parent to get new turbine data
                     this.$emit("updateTurbines", response.data.turbines);
 
                     // close modal
                     const modal = document.getElementById(
-                        "delete_component_modal"
+                        "delete_turbine_modal"
                     );
                     modal.close();
 
-                    // alert to show component has been deleted
-                    alert(response.data.message);
+                    iziToast.show({
+                        title: "Success",
+                        color: "red",
+                        position: "topCenter",
+                        timeout: 3000,
+                        message: response.data.message,
+                    });
                 })
                 .catch((error) => {
                     // Handle error
